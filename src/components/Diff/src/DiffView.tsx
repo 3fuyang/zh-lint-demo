@@ -13,13 +13,13 @@ interface DVProps {
 export const DiffView = memo(function DiffView({ changes }: DVProps) {
   return (
     <Card>
-      <Grid columns="2" align="center" overflow="auto">
+      <Grid columns="2" align="stretch" overflow="auto">
         {changes.length ? (
           <>
-            <Heading mb="2" as="h3" size="3" key="title-before">
+            <Heading mb="2" as="h3" size="3">
               Before
             </Heading>
-            <Heading mb="2" as="h3" size="3" key="title-after">
+            <Heading mb="2" as="h3" size="3">
               After
             </Heading>
             {generateDiffView(changes)}
@@ -30,7 +30,6 @@ export const DiffView = memo(function DiffView({ changes }: DVProps) {
             as="h2"
             size="3"
             weight="medium"
-            key="title-diff-view"
             className="col-span-2 mx-auto tracking-wide"
           >
             Diff View
@@ -74,25 +73,23 @@ function generateDiffView(diffs: Change[]) {
     } else if (!firstChange.added) {
       const normalCellLeft = (
         <Flex
-          p="1"
-          key={`${count}-normal-left`}
+          align='center'
           className="rounded-l-sm bg-white dark:bg-black"
         >
           <LineNumber no={count} />
           <Box flexGrow="1">
-            <Text wrap="wrap">{escapeHTMLTags(firstChange.value)}</Text>
+            <Text size='2' wrap="wrap">{escapeHTMLTags(firstChange.value)}</Text>
           </Box>
         </Flex>
       )
       const normalCellRight = (
         <Flex
-          p="1"
-          key={`${count}-normal-right`}
+          align='center'
           className="rounded-r-sm bg-white dark:bg-black"
         >
           <LineNumber no={count} />
           <Box flexGrow="1">
-            <Text wrap="wrap">{escapeHTMLTags(firstChange.value)}</Text>
+            <Text size='2' wrap="wrap">{escapeHTMLTags(firstChange.value)}</Text>
           </Box>
         </Flex>
       )
@@ -143,8 +140,7 @@ function parseLineDiff(removed: Change, added: Change) {
 function parsePres(pres: Token[], side: 'left' | 'right', lineNumber: number) {
   return (
     <Flex
-      key={`${lineNumber}-${side}-pre`}
-      p="1"
+      align='stretch'
       className={cn(
         side === 'left'
           ? 'bg-red-100 dark:bg-red-900'
@@ -153,11 +149,12 @@ function parsePres(pres: Token[], side: 'left' | 'right', lineNumber: number) {
       )}
     >
       <LineNumber no={lineNumber} />
-      <Flex flexGrow="1" wrap="wrap">
+      <Box flexGrow="1" overflow='auto'>
         {pres.map(({ type, value }, i) => {
           return (
             <Text
               key={`${i + 1}-token-${type}`}
+              size='2'
               color={
                 type === 'added' ? 'green' : type === 'removed' ? 'red' : 'gray'
               }
@@ -171,7 +168,7 @@ function parsePres(pres: Token[], side: 'left' | 'right', lineNumber: number) {
             </Text>
           )
         })}
-      </Flex>
+      </Box>
     </Flex>
   )
 }

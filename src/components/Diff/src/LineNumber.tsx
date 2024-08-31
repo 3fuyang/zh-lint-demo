@@ -1,4 +1,4 @@
-import { Text } from '@radix-ui/themes'
+import { Box, Text } from '@radix-ui/themes'
 
 interface LNProps {
   no: number
@@ -6,8 +6,19 @@ interface LNProps {
 
 export function LineNumber({ no }: LNProps) {
   return (
-    <Text color="gray" truncate className="mr-1 w-5 select-none tracking-tight">
-      {no}
-    </Text>
+    <Box
+      flexShrink='0'
+      className='mr-2'
+    >
+      <Text
+        as='p'
+        color="gray"
+        size='2'
+        truncate
+        className="w-5 px-1 select-none tracking-tight"
+      >
+        {no}
+      </Text>
+    </Box>
   )
 }

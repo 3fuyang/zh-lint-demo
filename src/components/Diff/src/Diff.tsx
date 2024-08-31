@@ -4,7 +4,7 @@ import {
   EraserIcon,
   MagicWandIcon,
 } from '@radix-ui/react-icons'
-import { Button, DropdownMenu, Flex, Section, Text, Theme } from '@radix-ui/themes'
+import { Button, DropdownMenu, Flex, Section, Strong, Text, Theme } from '@radix-ui/themes'
 import { diffLines, type Change } from 'diff'
 import {
   useCallback,
@@ -59,17 +59,21 @@ function rulesReducer(prevState: Rules, action: RULES_ACTION_TYPE) {
 }
 
 export function Diff() {
+  const [, copyToClipboard] = useCopyToClipboard()
+
   const [_isPending, startTransition] = useTransition()
+
   const editorRef = useRef<HTMLTextAreaElement>(null)
   const inputRef = useRef('')
+
   const [changes, dispatchChanges] = useReducer(changesReducer, initialChanges)
   const [rules, dispatchRules] = useReducer(rulesReducer, initialRules)
 
-  const [, copyToClipboard] = useCopyToClipboard()
-
   const [result, setResult] = useState('')
+
   const [showCopied, setShowCopied] = useState(false)
 
+  const [charCount, setCharCount] = useState(0)
   const [duration, setDuration] = useState(0)
 
   const triggerLint = useCallback(async () => {
@@ -93,6 +97,7 @@ export function Diff() {
     const end = performance.now()
 
     setResult(result)
+    setCharCount(inputRef.current.length)
     setDuration(end - start)
 
     // Trigger a state transition.
@@ -142,9 +147,19 @@ export function Diff() {
             </Theme>
           </Flex>
 
-          <Text wrap='pretty'>
-            {duration ? `Execution time: ${duration.toFixed(2)}ms` : ''}
-          </Text>
+          {duration
+            ? (
+              <Text color="gray" wrap='pretty'>
+                <Strong>
+                  {charCount} chars
+                </Strong>
+                &nbsp;processed in&nbsp;
+                <Strong>
+                  {duration.toFixed(2)}ms
+                </Strong>
+              </Text>
+            )
+            : ''}
 
           <Flex gap="2" wrap='wrap'>
             <Button

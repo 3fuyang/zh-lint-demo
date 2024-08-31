@@ -11,10 +11,10 @@ export const Editor = forwardRef<HTMLTextAreaElement, EProps>(function Editor(
 ) {
   return (
     <TextArea
-      size="3"
+      size="2"
       ref={ref}
       placeholder="Type content which needs linting here."
-      rows={8}
+      rows={12}
       {...{ onChange }}
     />
   )
