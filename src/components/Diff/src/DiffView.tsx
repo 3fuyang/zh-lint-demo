@@ -73,7 +73,7 @@ function generateDiffView(diffs: Change[]) {
     } else if (!firstChange.added) {
       const normalCellLeft = (
         <Flex
-          align='center'
+          align='stretch'
           className="rounded-l-sm bg-white dark:bg-black"
         >
           <LineNumber no={count} />
@@ -84,7 +84,7 @@ function generateDiffView(diffs: Change[]) {
       )
       const normalCellRight = (
         <Flex
-          align='center'
+          align='stretch'
           className="rounded-r-sm bg-white dark:bg-black"
         >
           <LineNumber no={count} />

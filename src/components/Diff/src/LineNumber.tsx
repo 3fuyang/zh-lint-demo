@@ -15,7 +15,7 @@ export function LineNumber({ no }: LNProps) {
         color="gray"
         size='2'
         truncate
-        className="w-5 px-1 select-none tracking-tight"
+        className="w-5 p-1 select-none tracking-tight"
       >
         {no}
       </Text>
