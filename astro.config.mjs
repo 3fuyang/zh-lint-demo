@@ -9,4 +9,11 @@ export default defineConfig({
     react(),
     tailwind(),
   ],
+  vite: {
+    resolve: {
+      alias: {
+        'zhlint': 'zhlint/dist/zhlint.es.js'
+      }
+    }
+  }
 })

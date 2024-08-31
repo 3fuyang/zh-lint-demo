@@ -15,7 +15,6 @@ import {
   useTransition,
 } from 'react'
 import { useCopyToClipboard } from 'usehooks-ts'
-import { run } from 'zhlint'
 
 import { Config, type RULES_ACTION_TYPE } from './Config'
 import { DiffView } from './DiffView'
@@ -73,7 +72,7 @@ export function Diff() {
 
   const [duration, setDuration] = useState(0)
 
-  const triggerLint = useCallback(() => {
+  const triggerLint = useCallback(async () => {
     if (!inputRef.current) {
       alert('Invalid input.')
       return
@@ -81,7 +80,7 @@ export function Diff() {
 
     const start = performance.now()
 
-    const result = run(inputRef.current, {
+    const result = ((await import('zhlint')).run)(inputRef.current, {
       rules: {
         ...rules,
         preset: '',
