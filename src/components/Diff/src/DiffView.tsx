@@ -1,7 +1,9 @@
+import { Box, Card, Flex, Grid, Heading, Text } from '@radix-ui/themes'
 import type { Change } from 'diff'
 import { diffChars } from 'diff'
 import { memo } from 'react'
 
+import { cn } from '../../../utils/cn'
 import { LineNumber } from './LineNumber'
 
 interface DVProps {
@@ -10,23 +12,32 @@ interface DVProps {
 
 export const DiffView = memo(function DiffView({ changes }: DVProps) {
   return (
-    <div className="grid grid-cols-2 items-center overflow-auto rounded border p-4 text-slate-600 dark:border-gray-500 dark:text-slate-300">
-      {changes.length ? (
-        <>
-          <h2 key="title-before" className="font-semibold">
-            Before
-          </h2>
-          <h2 key="title-after" className="font-semibold">
-            After
-          </h2>
-          {generateDiffView(changes)}
-        </>
-      ) : (
-        <h2 key="title-diff-view" className="col-span-2 mx-auto tracking-wide">
-          Diff View
-        </h2>
-      )}
-    </div>
+    <Card>
+      <Grid columns="2" align="center" overflow="auto">
+        {changes.length ? (
+          <>
+            <Heading mb="2" as="h3" size="3" key="title-before">
+              Before
+            </Heading>
+            <Heading mb="2" as="h3" size="3" key="title-after">
+              After
+            </Heading>
+            {generateDiffView(changes)}
+          </>
+        ) : (
+          <Heading
+            color="gray"
+            as="h2"
+            size="3"
+            weight="medium"
+            key="title-diff-view"
+            className="col-span-2 mx-auto tracking-wide"
+          >
+            Diff View
+          </Heading>
+        )}
+      </Grid>
+    </Card>
   )
 })
 
@@ -57,31 +68,33 @@ function generateDiffView(diffs: Change[]) {
 
       result.push(
         parsePres(leftPre, 'left', count),
-        parsePres(rightPre, 'right', count)
+        parsePres(rightPre, 'right', count),
       )
       count++
     } else if (!firstChange.added) {
       const normalCellLeft = (
-        <div
+        <Flex
+          p="1"
           key={`${count}-normal-left`}
-          className="flex rounded-sm bg-white p-1 dark:bg-black"
+          className="rounded-l-sm bg-white dark:bg-black"
         >
           <LineNumber no={count} />
-          <div className="flex-1 whitespace-pre-wrap">
-            {escapeHTMLTags(firstChange.value)}
-          </div>
-        </div>
+          <Box flexGrow="1">
+            <Text wrap="wrap">{escapeHTMLTags(firstChange.value)}</Text>
+          </Box>
+        </Flex>
       )
       const normalCellRight = (
-        <div
+        <Flex
+          p="1"
           key={`${count}-normal-right`}
-          className="flex rounded-sm bg-white p-1 dark:bg-black"
+          className="rounded-r-sm bg-white dark:bg-black"
         >
           <LineNumber no={count} />
-          <div className="flex-1 whitespace-pre-wrap">
-            {escapeHTMLTags(firstChange.value)}
-          </div>
-        </div>
+          <Box flexGrow="1">
+            <Text wrap="wrap">{escapeHTMLTags(firstChange.value)}</Text>
+          </Box>
+        </Flex>
       )
       count++
       result.push(normalCellLeft, normalCellRight)
@@ -129,57 +142,60 @@ function parseLineDiff(removed: Change, added: Change) {
  */
 function parsePres(pres: Token[], side: 'left' | 'right', lineNumber: number) {
   return (
-    <div
+    <Flex
       key={`${lineNumber}-${side}-pre`}
-      className={[
+      p="1"
+      className={cn(
         side === 'left'
           ? 'bg-red-100 dark:bg-red-900'
           : 'bg-green-100 dark:bg-green-900',
-        'flex rounded-sm p-1',
-      ]
-        .join(' ')
-        .trim()}
+        side === 'left' ? 'rounded-l-sm' : 'rounded-r-md',
+      )}
     >
       <LineNumber no={lineNumber} />
-      <div className="flex-1">
+      <Flex flexGrow="1" wrap="wrap">
         {pres.map(({ type, value }, i) => {
           return (
-            <span
+            <Text
               key={`${i + 1}-token-${type}`}
-              className={[
+              color={
+                type === 'added' ? 'green' : type === 'removed' ? 'red' : 'gray'
+              }
+              className={cn(
                 type === 'added' ? 'bg-green-300 dark:bg-green-700' : '',
                 type === 'removed' ? 'bg-red-300 dark:bg-red-700' : '',
-                'whitespace-pre-wrap rounded-sm',
-              ]
-                .join(' ')
-                .trim()}
+                'whitespace-pre rounded-sm',
+              )}
             >
               {escapeHTMLTags(value)}
-            </span>
+            </Text>
           )
         })}
-      </div>
-    </div>
+      </Flex>
+    </Flex>
   )
 }
 
 /**
- * Escape html specific tages
+ * Escape html specific tags
  * @param str The value of an instance of `Token`.
  */
 function escapeHTMLTags(str: string) {
-  const result: Array<JSX.Element | string> = []
+  const result: (JSX.Element | string)[] = []
   const segs = str.split('\n')
   result.unshift(
     ...segs
       .reduce<typeof result>((prev, curr, index) => {
-        curr
-          ? prev.push(curr, <br key={`${index + 1}-br`} />)
-          : prev.push(<br key={`${index + 1}-br`} />)
+        if (curr) {
+          prev.push(curr, <br key={`${index + 1}-br`} />)
+        } else {
+          prev.push(<br key={`${index + 1}-br`} />)
+        }
+
         return prev
       }, [])
       // Remove the trailing line break.
-      .slice(0, -1)
+      .slice(0, -1),
   )
   return result
 }

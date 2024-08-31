@@ -1,12 +1,26 @@
+import {
+  CheckIcon,
+  CopyIcon,
+  EraserIcon,
+  MagicWandIcon,
+} from '@radix-ui/react-icons'
+import { Button, DropdownMenu, Flex, Section, Text, Theme } from '@radix-ui/themes'
+import { diffLines, type Change } from 'diff'
+import {
+  useCallback,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  useTransition,
+} from 'react'
+import { useCopyToClipboard } from 'usehooks-ts'
 import { run } from 'zhlint'
-import { type Change, diffLines } from 'diff'
-import { useCallback, useRef, useMemo, useTransition, useReducer } from 'react'
 
-import { Button } from '../../Button'
-import { PRESETS, initDefaultRules, type Rules } from './util'
 import { Config, type RULES_ACTION_TYPE } from './Config'
-import { Editor } from './Editor'
 import { DiffView } from './DiffView'
+import { Editor } from './Editor'
+import { PRESETS, initDefaultRules, type Rules } from './util'
 
 const initialChanges: Change[] = []
 
@@ -21,7 +35,7 @@ type CHANGES_ACTION_TYPE =
 
 function changesReducer(
   _prevState: typeof initialChanges,
-  action: CHANGES_ACTION_TYPE
+  action: CHANGES_ACTION_TYPE,
 ) {
   switch (action.type) {
     case 'lint':
@@ -52,11 +66,21 @@ export function Diff() {
   const [changes, dispatchChanges] = useReducer(changesReducer, initialChanges)
   const [rules, dispatchRules] = useReducer(rulesReducer, initialRules)
 
+  const [, copyToClipboard] = useCopyToClipboard()
+
+  const [result, setResult] = useState('')
+  const [showCopied, setShowCopied] = useState(false)
+
+  const [duration, setDuration] = useState(0)
+
   const triggerLint = useCallback(() => {
     if (!inputRef.current) {
       alert('Invalid input.')
       return
     }
+
+    const start = performance.now()
+
     const result = run(inputRef.current, {
       rules: {
         ...rules,
@@ -66,6 +90,12 @@ export function Diff() {
     const lineDiffs = diffLines(inputRef.current, result, {
       ignoreWhitespace: false,
     })
+
+    const end = performance.now()
+
+    setResult(result)
+    setDuration(end - start)
+
     // Trigger a state transition.
     startTransition(() => {
       dispatchChanges({ type: 'lint', payload: lineDiffs })
@@ -75,30 +105,70 @@ export function Diff() {
   const ButtonBox = useMemo(
     function ButtonBox() {
       return (
-        <div className="flex gap-4 overflow-auto mb-4">
-          <Button id="lint-btn" type="primary" onClick={() => triggerLint()}>
-            Lint
-          </Button>
-          {PRESETS.map((preset, i) => (
+        <Flex mb="4" gap="2" justify="between" wrap="wrap" align='center'>
+          <Flex gap="2" align="center" wrap='wrap'>
+            <Button id="lint-btn" onClick={triggerLint}>
+              <Flex align="center" gap="2">
+                <MagicWandIcon />
+                Lint
+              </Flex>
+            </Button>
+
+            <Theme asChild>
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger>
+                  <Button variant="soft">
+                    Presets
+                    <DropdownMenu.TriggerIcon />
+                  </Button>
+                </DropdownMenu.Trigger>
+
+                <DropdownMenu.Content>
+                  {PRESETS.map((preset, i) => (
+                    <DropdownMenu.Item
+                      key={i}
+                      onSelect={() => {
+                        inputRef.current = preset
+                        if (editorRef.current) {
+                          editorRef.current.value = preset
+                          triggerLint()
+                        }
+                      }}
+                    >
+                      Preset {i + 1}
+                    </DropdownMenu.Item>
+                  ))}
+                </DropdownMenu.Content>
+              </DropdownMenu.Root>
+            </Theme>
+          </Flex>
+
+          <Text wrap='pretty'>
+            {duration ? `Execution time: ${duration.toFixed(2)}ms` : ''}
+          </Text>
+
+          <Flex gap="2" wrap='wrap'>
             <Button
-              key={i}
-              id={`preset-btn-${i + 1}`}
-              type="primary"
-              onClick={() => {
-                inputRef.current = preset
-                if (editorRef.current) {
-                  editorRef.current.value = preset
-                  triggerLint()
+              color="grass"
+              variant={showCopied ? 'soft' : 'solid'}
+              onClick={async () => {
+                try {
+                  await copyToClipboard(result)
+                  setShowCopied(true)
+                  window.setTimeout(() => setShowCopied(false), 2000)
+                } catch (err) {
+                  console.error(err)
                 }
               }}
             >
-              Preset {i + 1}
+              <Flex align="center" gap="2">
+                {showCopied ? <CheckIcon /> : <CopyIcon />}
+                {showCopied ? 'Copied!' : 'Copy'}
+              </Flex>
             </Button>
-          ))}
-          <div className="flex flex-1 flex-row-reverse">
             <Button
               id="clr-btn"
-              type="danger"
+              color="red"
               onClick={() => {
                 inputRef.current = ''
                 if (editorRef.current) {
@@ -107,28 +177,33 @@ export function Diff() {
                 }
               }}
             >
-              Clear
+              <Flex align="center" gap="2">
+                <EraserIcon />
+                Clear
+              </Flex>
             </Button>
-          </div>
-        </div>
+          </Flex>
+        </Flex>
       )
     },
-    [triggerLint]
+    [triggerLint, showCopied, copyToClipboard, result],
   )
 
   return (
-    <div>
+    <Section py="0">
       {/* Config Form */}
       <Config {...{ rules, dispatchRules }} />
       {/* Btn Box */}
       {ButtonBox}
-      {/* Editor */}
-      <Editor
-        ref={editorRef}
-        onChange={(e) => (inputRef.current = e.target.value)}
-      />
-      {/* Diff View */}
-      <DiffView {...{ changes }} />
-    </div>
+      <Flex direction="column" gap="4">
+        {/* Editor */}
+        <Editor
+          ref={editorRef}
+          onChange={(e) => (inputRef.current = e.target.value)}
+        />
+        {/* Diff View */}
+        <DiffView {...{ changes }} />
+      </Flex>
+    </Section>
   )
 }

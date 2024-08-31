@@ -1,45 +1,31 @@
 ---
 import Layout from '../layouts/Layout.astro'
-import Section from '../components/Section.astro'
 import Diff from '../components/Diff'
+import { Section, Heading, Flex, Link } from '@radix-ui/themes'
 ---
 
-<style is:global>
-  details[open] .right-arrow {
-    transform: rotate(90deg);
-  }
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-</style>
-<Layout title="Zhlint Demo">
-  <main>
-    <Section>
-      <div class="flex justify-between">
-        <h1 class="tracking-wide text-lg">Zhlint Demo</h1>
-        <a
-          class="transition-colors hover:text-slate-500 dark:hover:text-slate-300"
-          href="https://github.com/3fuyang/zh-lint-demo"
-          target="_blank"
-          rel="noreferrer"
-        >
-          GitHub
-        </a>
-      </div>
-    </Section>
-    <Section>
-      This is a demo to test
-      <a
-        class="text-green-700 transition-colors hover:text-green-600 focus:text-green-600 hover:underline focus:underline"
-        href="https://github.com/Jinjiang/zhlint"
+<Layout title="Zhlint Playground">
+  <Section pt="0" pb="8">
+    <Flex justify="between" align="center">
+      <Heading as="h1"> Zhlint Playground </Heading>
+      <Link
+        href="https://github.com/3fuyang/zh-lint-demo"
         target="_blank"
-        rel="noreferrer"
+        rel="noreferrer noopener nofollow"
       >
-        zhlint
-      </a>.
-    </Section>
-    <Section>
-      <Diff client:idle />
-    </Section>
-  </main>
+        GitHub
+      </Link>
+    </Flex>
+  </Section>
+  <Section pt="0" pb="8">
+    This is a playground for
+    <Link
+      href="https://github.com/Jinjiang/zhlint"
+      target="_blank"
+      rel="noreferrer nofollow noopener"
+    >
+      zhlint
+    </Link>.
+  </Section>
+  <Diff client:idle />
 </Layout>

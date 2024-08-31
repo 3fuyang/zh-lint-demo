@@ -1,4 +1,10 @@
 ---
+import { Theme } from '@radix-ui/themes'
+import { ThemeProvider } from 'next-themes'
+
+import '@radix-ui/themes/styles.css'
+import '../base.css'
+
 export interface Props {
   title: string
 }
@@ -6,7 +12,7 @@ export interface Props {
 const { title } = Astro.props
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -19,7 +25,11 @@ const { title } = Astro.props
     />
     <title>{title}</title>
   </head>
-  <body class="dark:bg-black bg-white text-slate-800 dark:text-slate-200">
-    <slot />
+  <body class="px-6 py-4">
+    <ThemeProvider attribute="class">
+      <Theme client:idle>
+        <slot />
+      </Theme>
+    </ThemeProvider>
   </body>
 </html>

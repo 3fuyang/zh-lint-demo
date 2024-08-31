@@ -1,14 +1,10 @@
 import type { Options } from 'zhlint'
+import type { DeprecatedOptions } from 'zhlint/lib/rules/util'
+
+type RuleOptions = NonNullable<Options['rules']>
 
 export type Rules = Required<
-  Omit<
-    NonNullable<Options['rules']>,
-    | 'preset'
-    | 'noSpaceInsideMark'
-    | 'spaceBetweenHalfWidthContent'
-    | 'noSpaceBetweenFullWidthContent'
-    | 'spaceBetweenMixedWidthContent'
-  >
+  Omit<RuleOptions, keyof DeprecatedOptions | 'preset'>
 >
 
 export function initDefaultRules(): Rules {
@@ -17,9 +13,9 @@ export function initDefaultRules(): Rules {
     noSinglePair: true,
 
     // punctuation
-    halfWidthPunctuation: `()`,
-    fullWidthPunctuation: `，。：；？！“”‘’`,
-    adjustedFullWidthPunctuation: `“”‘’`,
+    halfwidthPunctuation: `()`,
+    fullwidthPunctuation: `，。：；？！“”‘’`,
+    adjustedFullwidthPunctuation: `“”‘’`,
     unifiedPunctuation: `simplified`,
 
     // case: abbrs
@@ -37,30 +33,30 @@ export function initDefaultRules(): Rules {
     ],
 
     // space around content
-    spaceBetweenHalfWidthLetters: true,
-    noSpaceBetweenFullWidthLetters: true,
-    spaceBetweenMixedWidthLetters: true,
+    spaceBetweenHalfwidthContent: true,
+    noSpaceBetweenFullwidthContent: true,
+    spaceBetweenMixedwidthContent: true,
 
     // space around punctuation
-    noSpaceBeforePunctuation: true,
-    spaceAfterHalfWidthPunctuation: true,
-    noSpaceAfterFullWidthPunctuation: true,
+    noSpaceBeforePauseOrStop: true,
+    spaceAfterHalfwidthPauseOrStop: true,
+    noSpaceAfterFullwidthPauseOrStop: true,
 
     // space around quote
-    spaceOutsideHalfQuote: true,
-    noSpaceOutsideFullQuote: true,
-    noSpaceInsideQuote: true,
+    spaceOutsideHalfwidthQuotation: true,
+    noSpaceOutsideFullwidthQuotation: true,
+    noSpaceInsideQuotation: true,
 
     // space around bracket
-    spaceOutsideHalfBracket: true,
-    noSpaceOutsideFullBracket: true,
+    spaceOutsideHalfwidthBracket: true,
+    noSpaceOutsideFullwidthBracket: true,
     noSpaceInsideBracket: true,
 
     // space around code
     spaceOutsideCode: true,
 
     // space around mark
-    noSpaceInsideWrapper: true,
+    noSpaceInsideHyperMark: true,
 
     // trim space
     trimSpace: true,
@@ -68,8 +64,8 @@ export function initDefaultRules(): Rules {
     // case: number x Chinese unit
     skipZhUnits: `年月日天号时分秒`,
 
-    // custom preset
-    // preset: 'default'
+    /* SKIP PURE WESTERN SENTENCES */
+    skipPureWestern: true,
   }
 }
 
