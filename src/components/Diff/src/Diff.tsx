@@ -4,7 +4,15 @@ import {
   EraserIcon,
   MagicWandIcon,
 } from '@radix-ui/react-icons'
-import { Button, DropdownMenu, Flex, Section, Strong, Text, Theme } from '@radix-ui/themes'
+import {
+  Button,
+  DropdownMenu,
+  Flex,
+  Section,
+  Strong,
+  Text,
+  Theme,
+} from '@radix-ui/themes'
 import { diffLines, type Change } from 'diff'
 import {
   useCallback,
@@ -61,7 +69,7 @@ function rulesReducer(prevState: Rules, action: RULES_ACTION_TYPE) {
 export function Diff() {
   const [, copyToClipboard] = useCopyToClipboard()
 
-  const [_isPending, startTransition] = useTransition()
+  const [, startTransition] = useTransition()
 
   const editorRef = useRef<HTMLTextAreaElement>(null)
   const inputRef = useRef('')
@@ -84,7 +92,7 @@ export function Diff() {
 
     const start = performance.now()
 
-    const result = ((await import('zhlint')).run)(inputRef.current, {
+    const result = (await import('zhlint')).run(inputRef.current, {
       rules: {
         ...rules,
         preset: '',
@@ -106,102 +114,95 @@ export function Diff() {
     })
   }, [rules])
 
-  const ButtonBox = useMemo(
-    function ButtonBox() {
-      return (
-        <Flex mb="4" gap="2" justify="between" wrap="wrap" align='center'>
-          <Flex gap="2" align="center" wrap='wrap'>
-            <Button id="lint-btn" onClick={triggerLint}>
-              <Flex align="center" gap="2">
-                <MagicWandIcon />
-                Lint
-              </Flex>
-            </Button>
+  const ButtonBox = useMemo(() => {
+    return (
+      <Flex mb="4" gap="2" justify="between" wrap="wrap" align="center">
+        <Flex gap="2" align="center" wrap="wrap">
+          <Button id="lint-btn" onClick={triggerLint}>
+            <Flex align="center" gap="2">
+              <MagicWandIcon />
+              Lint
+            </Flex>
+          </Button>
 
-            <Theme asChild>
-              <DropdownMenu.Root>
-                <DropdownMenu.Trigger>
-                  <Button variant="soft">
-                    Presets
-                    <DropdownMenu.TriggerIcon />
-                  </Button>
-                </DropdownMenu.Trigger>
+          <Theme asChild>
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger>
+                <Button variant="soft">
+                  Presets
+                  <DropdownMenu.TriggerIcon />
+                </Button>
+              </DropdownMenu.Trigger>
 
-                <DropdownMenu.Content>
-                  {PRESETS.map((preset, i) => (
-                    <DropdownMenu.Item
-                      key={i}
-                      onSelect={() => {
-                        inputRef.current = preset
-                        if (editorRef.current) {
-                          editorRef.current.value = preset
-                          triggerLint()
-                        }
-                      }}
-                    >
-                      Preset {i + 1}
-                    </DropdownMenu.Item>
-                  ))}
-                </DropdownMenu.Content>
-              </DropdownMenu.Root>
-            </Theme>
-          </Flex>
-
-          {duration
-            ? (
-              <Text color="gray" wrap='pretty'>
-                <Strong>
-                  {charCount} chars
-                </Strong>
-                &nbsp;processed in&nbsp;
-                <Strong>
-                  {duration.toFixed(2)}ms
-                </Strong>
-              </Text>
-            )
-            : ''}
-
-          <Flex gap="2" wrap='wrap'>
-            <Button
-              color="grass"
-              variant={showCopied ? 'soft' : 'solid'}
-              onClick={async () => {
-                try {
-                  await copyToClipboard(result)
-                  setShowCopied(true)
-                  window.setTimeout(() => setShowCopied(false), 2000)
-                } catch (err) {
-                  console.error(err)
-                }
-              }}
-            >
-              <Flex align="center" gap="2">
-                {showCopied ? <CheckIcon /> : <CopyIcon />}
-                {showCopied ? 'Copied!' : 'Copy'}
-              </Flex>
-            </Button>
-            <Button
-              id="clr-btn"
-              color="red"
-              onClick={() => {
-                inputRef.current = ''
-                if (editorRef.current) {
-                  editorRef.current.value = ''
-                  dispatchChanges({ type: 'reset' })
-                }
-              }}
-            >
-              <Flex align="center" gap="2">
-                <EraserIcon />
-                Clear
-              </Flex>
-            </Button>
-          </Flex>
+              <DropdownMenu.Content>
+                {PRESETS.map((preset, i) => (
+                  <DropdownMenu.Item
+                    key={i}
+                    onSelect={() => {
+                      inputRef.current = preset
+                      if (editorRef.current) {
+                        editorRef.current.value = preset
+                        triggerLint()
+                      }
+                    }}
+                  >
+                    Preset {i + 1}
+                  </DropdownMenu.Item>
+                ))}
+              </DropdownMenu.Content>
+            </DropdownMenu.Root>
+          </Theme>
         </Flex>
-      )
-    },
-    [triggerLint, showCopied, copyToClipboard, result],
-  )
+
+        {duration ? (
+          <Text color="gray" wrap="pretty">
+            <Strong>{charCount} chars</Strong>
+            &nbsp;processed in&nbsp;
+            <Strong>{duration.toFixed(2)}ms</Strong>
+          </Text>
+        ) : (
+          ''
+        )}
+
+        <Flex gap="2" wrap="wrap">
+          <Button
+            color="grass"
+            variant={showCopied ? 'soft' : 'solid'}
+            onClick={async () => {
+              try {
+                await copyToClipboard(result)
+                setShowCopied(true)
+                window.setTimeout(() => setShowCopied(false), 2000)
+              } catch (err) {
+                console.error(err)
+              }
+            }}
+          >
+            <Flex align="center" gap="2">
+              {showCopied ? <CheckIcon /> : <CopyIcon />}
+              {showCopied ? 'Copied!' : 'Copy'}
+            </Flex>
+          </Button>
+          <Button
+            id="clr-btn"
+            color="red"
+            onClick={() => {
+              inputRef.current = ''
+              if (editorRef.current) {
+                editorRef.current.value = ''
+                dispatchChanges({ type: 'reset' })
+              }
+            }}
+          >
+            <Flex align="center" gap="2">
+              <EraserIcon />
+              Clear
+            </Flex>
+          </Button>
+        </Flex>
+      </Flex>
+    )
+  }, [triggerLint, showCopied, copyToClipboard, result])
 
   return (
     <Section py="0">

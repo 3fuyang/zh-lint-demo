@@ -6,16 +6,13 @@ interface LNProps {
 
 export function LineNumber({ no }: LNProps) {
   return (
-    <Box
-      flexShrink='0'
-      className='mr-2'
-    >
+    <Box flexShrink="0" className="mr-2">
       <Text
-        as='p'
+        as="p"
         color="gray"
-        size='2'
+        size="2"
         truncate
-        className="w-5 p-1 select-none tracking-tight"
+        className="w-5 select-none p-1 tracking-tight"
       >
         {no}
       </Text>

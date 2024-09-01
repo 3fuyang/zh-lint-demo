@@ -14,4 +14,7 @@ export default tseslint.config(
       parser: tsParser,
     },
   },
+  {
+    ignores: ['**/node_modules/**', 'dist/**'],
+  },
 )

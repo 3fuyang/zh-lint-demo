@@ -1,19 +1,25 @@
 # Zhlint Demo
 
-[Online Demo](https://dulcet-boba-b42e9a.netlify.app/)
-
 An intuitive playground for [zhlint](https://jinjiang.dev/zhlint/).
 
 The diffing is provided by [diff](https://github.com/kpdecker/jsdiff).
 
 ## How to Run
 
-```shell
-npm ci
+```bash
+corepack enable
 
-npm run dev
+pnpm i
 
-npm run build
+pnpm dev
 
-npm run preview
 ```
+
+## TODO
+
+- [ ] More examples
+- [ ] Rich Content Editor
+- [x] Preload Assets - more accurately said, hoisted
+- [ ] PWA
+- [ ] Refactor Diff View
+- [ ] LSP

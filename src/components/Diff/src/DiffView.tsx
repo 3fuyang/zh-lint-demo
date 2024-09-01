@@ -72,24 +72,22 @@ function generateDiffView(diffs: Change[]) {
       count++
     } else if (!firstChange.added) {
       const normalCellLeft = (
-        <Flex
-          align='stretch'
-          className="rounded-l-sm bg-white dark:bg-black"
-        >
+        <Flex align="stretch" className="rounded-l-sm bg-white dark:bg-black">
           <LineNumber no={count} />
           <Box flexGrow="1">
-            <Text size='2' wrap="wrap">{escapeHTMLTags(firstChange.value)}</Text>
+            <Text size="2" wrap="wrap">
+              {escapeHTMLTags(firstChange.value)}
+            </Text>
           </Box>
         </Flex>
       )
       const normalCellRight = (
-        <Flex
-          align='stretch'
-          className="rounded-r-sm bg-white dark:bg-black"
-        >
+        <Flex align="stretch" className="rounded-r-sm bg-white dark:bg-black">
           <LineNumber no={count} />
           <Box flexGrow="1">
-            <Text size='2' wrap="wrap">{escapeHTMLTags(firstChange.value)}</Text>
+            <Text size="2" wrap="wrap">
+              {escapeHTMLTags(firstChange.value)}
+            </Text>
           </Box>
         </Flex>
       )
@@ -140,7 +138,7 @@ function parseLineDiff(removed: Change, added: Change) {
 function parsePres(pres: Token[], side: 'left' | 'right', lineNumber: number) {
   return (
     <Flex
-      align='stretch'
+      align="stretch"
       className={cn(
         side === 'left'
           ? 'bg-red-100 dark:bg-red-900'
@@ -149,12 +147,12 @@ function parsePres(pres: Token[], side: 'left' | 'right', lineNumber: number) {
       )}
     >
       <LineNumber no={lineNumber} />
-      <Box flexGrow="1" overflow='auto'>
+      <Box flexGrow="1" overflow="auto">
         {pres.map(({ type, value }, i) => {
           return (
             <Text
               key={`${i + 1}-token-${type}`}
-              size='2'
+              size="2"
               color={
                 type === 'added' ? 'green' : type === 'removed' ? 'red' : 'gray'
               }
