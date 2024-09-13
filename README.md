@@ -19,7 +19,7 @@ pnpm dev
 
 - [ ] More examples
 - [ ] Rich Content Editor
-- [x] Preload Assets - more accurately said, hoisted
+- [ ] Preload Assets
 - [ ] PWA
 - [ ] Refactor Diff View
 - [ ] LSP

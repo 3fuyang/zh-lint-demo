@@ -3,6 +3,7 @@
 
 # build output
 dist/
+build/
 .output/
 
 # dependencies

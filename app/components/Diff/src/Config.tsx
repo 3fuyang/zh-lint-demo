@@ -1,5 +1,4 @@
-import type { Dispatch } from 'react'
-import { memo, useRef, useState } from 'react'
+import { memo, useCallback, useRef, useState, useTransition } from 'react'
 
 import * as Collapsible from '@radix-ui/react-collapsible'
 import { ChevronRightIcon, Cross2Icon, ResetIcon } from '@radix-ui/react-icons'
@@ -16,6 +15,7 @@ import {
   IconButton,
   Popover,
   RadioGroup,
+  Reset,
   Section,
   Switch,
   Text,
@@ -23,6 +23,9 @@ import {
 } from '@radix-ui/themes'
 import { cn } from '../../../utils/cn'
 import type { Rules } from './util'
+import { useAtom } from 'jotai'
+import { $rules } from '../../../store/lint'
+import { useResetAtom } from 'jotai/utils'
 
 export type RULES_ACTION_TYPE =
   | {
@@ -36,12 +39,17 @@ export type RULES_ACTION_TYPE =
       payload: null
     }
 
-interface CProps {
-  rules: Rules
-  dispatchRules: Dispatch<RULES_ACTION_TYPE>
-}
+export const Config = memo(function Config() {
+  const [rules, _setRules] = useAtom($rules)
+  const resetRules = useResetAtom($rules)
 
-export const Config = memo(function Config({ rules, dispatchRules }: CProps) {
+  const [, startTransition] = useTransition()
+  const setRules = useCallback<typeof _setRules>((nextRules) => {
+    startTransition(() => {
+      _setRules(nextRules)
+    })
+  }, [_setRules])
+
   const rulesEntries = Object.entries(rules)
 
   const [open, setOpen] = useState(false)
@@ -51,21 +59,23 @@ export const Config = memo(function Config({ rules, dispatchRules }: CProps) {
   return (
     <Section pt="0" pb="4">
       <Collapsible.Root {...{ open }} onOpenChange={setOpen}>
-        <Collapsible.Trigger>
-          <Flex gap="2" align="center">
-            <IconButton asChild variant="ghost" size="1">
-              <Box>
-                <ChevronRightIcon
-                  className={cn(
-                    'transform transition-transform',
-                    open && 'rotate-90',
-                  )}
-                />
-              </Box>
-            </IconButton>
-            <Heading as="h2">Configuration</Heading>
-          </Flex>
-        </Collapsible.Trigger>
+        <Reset>
+          <Collapsible.Trigger>
+            <Flex gap="2" align="center">
+              <IconButton asChild variant="ghost" size="1">
+                <Box>
+                  <ChevronRightIcon
+                    className={cn(
+                      'transform transition-transform',
+                      open && 'rotate-90',
+                    )}
+                  />
+                </Box>
+              </IconButton>
+              <Heading as="h2">Configuration</Heading>
+            </Flex>
+          </Collapsible.Trigger>
+        </Reset>
 
         <Collapsible.Content>
           <Grid
@@ -106,10 +116,12 @@ export const Config = memo(function Config({ rules, dispatchRules }: CProps) {
                           id={key}
                           value={val as string}
                           onValueChange={(newVal) => {
-                            dispatchRules({
-                              type: 'unifiedPunctuation',
-                              payload: newVal as 'simplified' | 'traditional',
-                            })
+                            setRules((r) => ({
+                              ...r,
+                              unifiedPunctuation: newVal as
+                                | 'simplified'
+                                | 'traditional',
+                            }))
                           }}
                         >
                           {/* Simplified Radio */}
@@ -134,10 +146,10 @@ export const Config = memo(function Config({ rules, dispatchRules }: CProps) {
                         id={key}
                         checked={val as boolean}
                         onCheckedChange={(newVal) =>
-                          dispatchRules({
-                            type: key as 'noSinglePair',
-                            payload: newVal,
-                          })
+                          setRules((r) => ({
+                            ...r,
+                            [key]: newVal,
+                          }))
                         }
                       />
                     ) : typeof val === 'string' ? (
@@ -145,12 +157,12 @@ export const Config = memo(function Config({ rules, dispatchRules }: CProps) {
                         name={key}
                         id={key}
                         value={val}
-                        onChange={(e) =>
-                          dispatchRules({
-                            type: key as 'halfwidthPunctuation',
-                            payload: e.target.value,
-                          })
-                        }
+                        onChange={(e) => {
+                          setRules((r) => ({
+                            ...r,
+                            [key]: e.target.value,
+                          }))
+                        }}
                       />
                     ) : (
                       // Abbrs
@@ -179,10 +191,11 @@ export const Config = memo(function Config({ rules, dispatchRules }: CProps) {
                                       onClick={() => {
                                         const abbrsCpy = [...(val as string[])]
                                         abbrsCpy.splice(index, 1)
-                                        dispatchRules({
-                                          type: 'skipAbbrs',
-                                          payload: abbrsCpy,
-                                        })
+
+                                        setRules((r) => ({
+                                          ...r,
+                                          skipAbbrs: abbrsCpy,
+                                        }))
                                       }}
                                     >
                                       <Cross2Icon />
@@ -197,23 +210,21 @@ export const Config = memo(function Config({ rules, dispatchRules }: CProps) {
                                 ref={abbrInputRef}
                                 radius="full"
                                 size="1"
-                                id="new-abbr-input"
                                 placeholder="New abbreviation"
                                 name="New Abbr Input"
                               />
                               <Button
                                 size="1"
-                                id="add-abbreviation"
                                 radius="full"
                                 onClick={() => {
                                   const value = abbrInputRef.current?.value
 
                                   if (!value) return
 
-                                  dispatchRules({
-                                    type: 'skipAbbrs',
-                                    payload: [...(val as string[]), value],
-                                  })
+                                  setRules((r) => ({
+                                    ...r,
+                                    skipAbbrs: [...(val as string[]), value],
+                                  }))
 
                                   abbrInputRef.current!.value = ''
                                 }}
@@ -231,10 +242,7 @@ export const Config = memo(function Config({ rules, dispatchRules }: CProps) {
             </ul>
           </Grid>
           <Box my="4">
-            <Button
-              radius="full"
-              onClick={() => dispatchRules({ type: 'reset', payload: null })}
-            >
+            <Button radius="full" onClick={resetRules}>
               <Flex gap="1" align="center">
                 <ResetIcon />
                 Reset

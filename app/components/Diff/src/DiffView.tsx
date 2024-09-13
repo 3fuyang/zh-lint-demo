@@ -5,16 +5,16 @@ import { memo } from 'react'
 
 import { cn } from '../../../utils/cn'
 import { LineNumber } from './LineNumber'
+import { useAtomValue } from 'jotai'
+import { $lint } from '../../../store/lint'
 
-interface DVProps {
-  changes: Change[]
-}
+export const DiffView = memo(function DiffView() {
+  const { lineDiffs } = useAtomValue($lint)
 
-export const DiffView = memo(function DiffView({ changes }: DVProps) {
   return (
     <Card>
       <Grid columns="2" align="stretch" overflow="auto">
-        {changes.length ? (
+        {lineDiffs.length ? (
           <>
             <Heading mb="2" as="h3" size="3">
               Before
@@ -22,7 +22,7 @@ export const DiffView = memo(function DiffView({ changes }: DVProps) {
             <Heading mb="2" as="h3" size="3">
               After
             </Heading>
-            {generateDiffView(changes)}
+            {generateDiffView(lineDiffs)}
           </>
         ) : (
           <Heading
