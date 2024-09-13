@@ -1,10 +1,12 @@
 {
+  "include": ["env.d.ts", "**/*.ts", "**/*.tsx", "netlify-edge-plugin.ts"],
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "types": ["@remix-run/node", "vite/client"],
     "skipLibCheck": true,
     "module": "ESNext",
-    "moduleResolution": "Bundler"
+    "moduleResolution": "Bundler",
+    "noEmit": true
   }
 }
