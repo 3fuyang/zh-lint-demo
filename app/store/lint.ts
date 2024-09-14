@@ -2,7 +2,7 @@ import { diffLines, type Change } from 'diff'
 import { atom } from 'jotai'
 import { atomWithReset } from 'jotai/utils'
 
-import { initDefaultRules, type Rules } from '../components/Diff/src/util'
+import { initDefaultRules, type Rules } from '../components/Diff/util'
 import { $doc } from './doc'
 
 export const $rules = atomWithReset<Rules>(initDefaultRules())

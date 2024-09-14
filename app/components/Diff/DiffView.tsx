@@ -3,10 +3,10 @@ import type { Change } from 'diff'
 import { diffChars } from 'diff'
 import { memo } from 'react'
 
-import { cn } from '../../../utils/cn'
+import { cn } from '../../utils/cn'
 import { LineNumber } from './LineNumber'
 import { useAtomValue } from 'jotai'
-import { $lint } from '../../../store/lint'
+import { $lint } from '../../store/lint'
 
 export const DiffView = memo(function DiffView() {
   const { lineDiffs } = useAtomValue($lint)

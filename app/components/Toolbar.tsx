@@ -13,7 +13,7 @@ import { useCopyToClipboard } from 'usehooks-ts'
 import { $editorView } from '../store/cm'
 import { $doc } from '../store/doc'
 import { $lint, $lintResult } from '../store/lint'
-import { PRESETS } from './Diff/src/util'
+import { PRESETS } from './Diff/util'
 
 export function Toolbar() {
   const doc = useAtomValue($doc)

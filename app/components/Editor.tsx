@@ -3,10 +3,10 @@ import { EditorView, placeholder } from '@codemirror/view'
 import { basicSetup } from 'codemirror'
 import { useSetAtom } from 'jotai'
 import { useEffect, useRef, useTransition } from 'react'
-import { $editorView } from '../../../store/cm'
-import { $doc } from '../../../store/doc'
+import { $editorView } from '../store/cm'
+import { $doc } from '../store/doc'
 
-export function Editor() {
+export default function Editor() {
   const editorRootRef = useRef<HTMLDivElement>(null)
   const [, startTransition] = useTransition()
   const setEditorView = useSetAtom($editorView)
