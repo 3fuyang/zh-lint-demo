@@ -1,10 +1,15 @@
-import { Flex, Heading, Link, Section } from '@radix-ui/themes'
-// import { Provider } from 'jotai'
-import { DiffView, Editor } from '../components/Diff'
-import { Config } from '../components/Diff/src/Config'
+import { Box, Flex, Heading, Link, Section, Skeleton } from '@radix-ui/themes'
+import { DiffView } from '../components/Diff/DiffView'
+import { ConfigPanel } from '../components/ConfigPanel'
 import { Toolbar } from '../components/Toolbar'
-// import { $editorViewStore } from '../store/cm'
-// import { $docStore } from '../store/doc'
+import { lazy, Suspense } from 'react'
+import type { MetaFunction } from '@remix-run/react'
+
+const Editor = lazy(() => import('../components/Editor'))
+
+export const meta: MetaFunction = () => {
+  return [{ title: `Zhlint Playground` }];
+}
 
 export default function Index() {
   return (
@@ -33,18 +38,20 @@ export default function Index() {
         .
       </Section>
       <Section py="0">
-        {/* <Provider store={$editorViewStore}> */}
-          {/* <Provider store={$docStore}> */}
-            <Config />
-            <Toolbar />
-            <Flex direction="column" gap="4">
-              {/* Editor */}
-              <Editor />
-              {/* Diff View */}
-              <DiffView />
-            </Flex>
-          {/* </Provider> */}
-        {/* </Provider> */}
+        <ConfigPanel />
+        <Toolbar />
+        <Flex direction="column" gap="4">
+          <Suspense
+            fallback={
+              <Skeleton>
+                <Box height='30.4px' />
+              </Skeleton>
+            }
+          >
+            <Editor />
+          </Suspense>
+          <DiffView />
+        </Flex>
       </Section>
     </>
   )
