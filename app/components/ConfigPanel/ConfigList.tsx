@@ -205,7 +205,12 @@ export default function ConfigList() {
         </ul>
       </Grid>
       <Box my="4">
-        <Button radius="full" onClick={resetRules}>
+        <Button
+          radius="full"
+          onClick={() => {
+            startTransition(resetRules)
+          }}
+        >
           <Flex gap="1" align="center">
             <ResetIcon />
             Reset
